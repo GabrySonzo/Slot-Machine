@@ -13,28 +13,51 @@ public class ServerThread extends Thread{
 
     public void run() {
         try {
-            String[] simbols = ["ciliegia","banana","mela","arancia","uva","diamante","spugna","volpe","tasso","sette"];
-            boolean indovinato = false;
-            System.out.println("Il numero da indovinare per " + socket.getPort() + "/" + socket.getLocalPort() + " e' " + number);
+            String[] simbols = new String[]{"ciliegia","banana","mela","arancia","uva","diamante","spugna","volpe","tasso","sette"};
+            int[] values = new int[]{2,4,5,8,10,20,50,80,100,1000};
+
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream())); 
             DataOutputStream out = new DataOutputStream(socket.getOutputStream());
             while(true) {
                 String userInput = in.readLine();
                 if (userInput == null || userInput.equals("QUIT")){
-                    indovinato = true;
                     break;
                 }
-                System.out.print("Il Client " + socket.getPort() + "/" + socket.getLocalPort() +" ha puntato: " + userInput + " ");
+                System.out.print("Il Client " + socket.getPort() + "/" + socket.getLocalPort() +" ha puntato: " + userInput + " \n");
                 int bet = Integer.parseInt(userInput);
-                int[] r = new int[3];
+                int[] r1 = new int[3];
+                int[] r2 = new int[3];
+                int[] r3 = new int[3];
                 for(int i = 0; i < 3; i++){
-                    r[i] = (int)(Math.random() * 9);
+                    r2[i] = (int)(Math.random() * 9);
                 }
-                System.out.println("e' uscito: " + simbols[r[0]]  + " " + simbols[r[1]] + " " + simbols[r[2]]);
-            }
-            if(!indovinato){
-                out.writeBytes(number + "\n");
-                System.out.println("Il Client " + socket.getPort() + "/" + socket.getLocalPort() + " ha esaurito i tentativi");
+                for(int i = 0; i < 3; i++){
+                    r3[i] = r2[i]+1;
+                    if(r3[i] > 9){
+                        r3[i] -= 10;
+                    }
+                }
+                for(int i = 0; i < 3; i++){
+                    r1[i] = r2[i]-1;
+                    if(r1[i] < 0){
+                        r1[i] += 10;
+                    }
+                }
+                for(int i = 0; i < 3; i++){
+                    if(r1[i] == r2[i] && r2[i] == r3[i]){
+                        bet *= values[r1[i]];
+                    }
+                    else if(r1[i] == r2[i] || r2[i] == r3[i] || r1[i] == r3[i]){
+                        bet *= values[r1[i]]/2;
+                    }
+                    else{
+                        bet = 0;
+                    }
+                }
+                System.out.println("e' uscito: " + simbols[r1[0]]  + " " + simbols[r1[1]] + " " + simbols[r1[2]] + "\n");
+                System.out.println("e' uscito: " + simbols[r2[0]]  + " " + simbols[r2[1]] + " " + simbols[r2[2]] + "\n");
+                System.out.println("e' uscito: " + simbols[r3[0]]  + " " + simbols[r3[1]] + " " + simbols[r3[2]] + "\n");
+                out.writeBytes(bet + "\n");
             }
             out.close();
             in.close();
