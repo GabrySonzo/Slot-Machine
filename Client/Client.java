@@ -10,7 +10,7 @@ public class Client {
         //Connessione della Socket con il Server 
         Socket socket = new Socket("localhost", 7777); 
 
-        //Stream di byte da passare al Socket 
+        //Stream di byte da passare al Socke
         DataOutputStream out = new DataOutputStream(socket.getOutputStream()); 
         BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream())); 
         BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in)); 
