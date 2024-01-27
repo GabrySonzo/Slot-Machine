@@ -15,9 +15,14 @@ public class ServerThread extends Thread{
         try {
             String[] simbols = new String[]{"ciliegia","banana","mela","arancia","uva","diamante","spugna","volpe","tasso","sette"};
             int[] values = new int[]{2,4,5,8,10,20,50,80,100,1000};
+            int cash = 10000;
 
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream())); 
-            DataOutputStream out = new DataOutputStream(socket.getOutputStream());
+            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
+            String[] response = new String[4];
+            //response[3] = cash + "";
+            //out.writeObject(response);
+
             while(true) {
                 String userInput = in.readLine();
                 if (userInput == null || userInput.equals("QUIT")){
@@ -25,6 +30,7 @@ public class ServerThread extends Thread{
                 }
                 System.out.print("Il Client " + socket.getPort() + "/" + socket.getLocalPort() +" ha puntato: " + userInput + " \n");
                 int bet = Integer.parseInt(userInput);
+                cash += bet;
                 int[] r1 = new int[3];
                 int[] r2 = new int[3];
                 int[] r3 = new int[3];
@@ -43,21 +49,41 @@ public class ServerThread extends Thread{
                         r1[i] += 10;
                     }
                 }
-                for(int i = 0; i < 3; i++){
-                    if(r1[i] == r2[i] && r2[i] == r3[i]){
-                        bet *= values[r1[i]];
-                    }
-                    else if(r1[i] == r2[i] || r2[i] == r3[i] || r1[i] == r3[i]){
-                        bet *= values[r1[i]]/2;
-                    }
-                    else{
-                        bet = 0;
-                    }
+            
+                if(r2[0] == r2[1] && r2[1] == r2[2]){
+                    bet *= values[r2[0]];
+                    System.out.println("moltiplicatore:" + values[r2[0]]/2);
+                    response[1] = "Hai fatto una tripletta";
+                    response[2] = "x" + values[r2[0]]/2;
                 }
+                else if(r2[0] == r2[1] || r2[1] == r2[2]){
+                    bet *= values[r2[1]]/2;
+                    System.out.println("moltiplicatore:" + values[r2[1]]/2);
+                    response[1] = "Hai fatto una doppia";
+                    response[2] = "x" + values[r2[1]]/2;
+                }
+                else if(r2[0] == r2[2]){
+                    bet *= values[r2[0]]/2;
+                    System.out.println("moltiplicatore:" + values[r2[0]]/2);
+                    response[1] = "Hai fatto una doppia";
+                    response[2] = "x" + values[r2[0]]/2;
+                }
+                else{
+                    bet = 0;
+                    response[1] = "Hai perso";
+                    response[2] = "x0";
+                }
+                
                 System.out.println("e' uscito: " + simbols[r1[0]]  + " " + simbols[r1[1]] + " " + simbols[r1[2]] + "\n");
                 System.out.println("e' uscito: " + simbols[r2[0]]  + " " + simbols[r2[1]] + " " + simbols[r2[2]] + "\n");
                 System.out.println("e' uscito: " + simbols[r3[0]]  + " " + simbols[r3[1]] + " " + simbols[r3[2]] + "\n");
-                out.writeBytes(bet + "\n");
+                
+                cash -= bet;
+                response[0] = bet + "";
+                response[3] = cash + "";
+                response[0] = "" + (int)(Math.random() * 100);
+                System.out.println(response[0] + " " + response[1] + " " + response[2] + " " + response[3] + "\n");
+                out.writeObject(response);
             }
             out.close();
             in.close();
