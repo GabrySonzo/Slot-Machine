@@ -6,7 +6,7 @@ import java.net.*;
 public class Client { 
 
     public void start()throws IOException, ClassNotFoundException{ 
-        //prova
+        
         //Connessione della Socket con il Server 
         Socket socket = new Socket("localhost", 7777); 
 
