@@ -13,6 +13,7 @@ public class Client {
         //Stream di byte da passare al Socket
         DataOutputStream out = new DataOutputStream(socket.getOutputStream()); 
         ObjectInputStream in = new ObjectInputStream(socket.getInputStream()); 
+        //BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
         //String[] serverResponse = {"","","",""};
 
@@ -20,12 +21,14 @@ public class Client {
 
         //Ciclo infinito per inserimento testo del Client 
         int cash = 1000;
-        int slot = 10000;
-        //try{
-           // String[] serverResponse = (String[])in.readObject();
-        /* }catch(ClassNotFoundException e){
+        int slot = 0;
+
+        try{
+            String[] serverResponse = (String[])in.readObject();
+            slot = Integer.parseInt(serverResponse[3]); 
+         }catch(ClassNotFoundException e){
             System.out.println("Errore");
-        }*/
+        }
 
         while (true) 
         { 
@@ -45,6 +48,10 @@ public class Client {
                 out.writeBytes(userInput + '\n');
 
                 String[] serverResponse = (String[])in.readObject();
+                if(serverResponse[4] == "false"){
+                    System.out.println("La slot ha finito i soldi, ha vinto l'utente" + serverResponse[5]);
+                    break;
+                }
                 System.out.println(serverResponse[0] + " " + serverResponse[1] + " " + serverResponse[2] + " " + serverResponse[3] + " ");
                 System.out.println(serverResponse[1] + "(" + serverResponse[2] + ")\n");
                 cash += Integer.parseInt(serverResponse[0]);
