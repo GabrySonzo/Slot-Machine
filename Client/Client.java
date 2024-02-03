@@ -48,11 +48,11 @@ public class Client {
                 out.writeBytes(userInput + '\n');
 
                 String[] serverResponse = (String[])in.readObject();
-                if(serverResponse[4] == "false"){
-                    System.out.println("La slot ha finito i soldi, ha vinto l'utente" + serverResponse[5]);
+                //System.out.println(serverResponse[0] + " " + serverResponse[1] + " " + serverResponse[2] + " " + serverResponse[3] + " " + serverResponse[4] + " " + serverResponse[5] + "\n");
+                if(serverResponse[4].equals("perso")){
+                    System.out.println("La slot ha finito i soldi, ha vinto l'utente " + serverResponse[5]);
                     break;
                 }
-                System.out.println(serverResponse[0] + " " + serverResponse[1] + " " + serverResponse[2] + " " + serverResponse[3] + " ");
                 System.out.println(serverResponse[1] + "(" + serverResponse[2] + ")\n");
                 cash += Integer.parseInt(serverResponse[0]);
                 slot = Integer.parseInt(serverResponse[3]);

@@ -18,7 +18,7 @@ public class ServerThread extends Thread{
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream())); 
             ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-            String[] response = new String[4];
+            String[] response = new String[6];
             response[3] = Integer.toString(slot.getCash());
             out.writeUnshared(response);
 
@@ -29,11 +29,12 @@ public class ServerThread extends Thread{
                 }else{
 
                     int bet = Integer.parseInt(userInput);
+                    System.out.print("Il Client " + socket.getPort() + "/" + socket.getLocalPort() +" ha puntato: " + userInput + " \n");
+                    
                     response = (String[])slot.spin(bet, socket);
                     out.writeUnshared(response);
 
-                    System.out.print("Il Client " + socket.getPort() + "/" + socket.getLocalPort() +" ha puntato: " + userInput + " \n");
-                    System.out.println(response[0] + " " + response[1] + " " + response[2] + " " + response[3] + " " + "\n");
+                    System.out.println("[" + response[0] + "] [" + response[1] + "] [" + response[2] + "] [" + response[3] + "] [" + response[4] + "] [" + response[5] + "]\n");
                 }
                 /*System.out.println("e' uscito: " + simbols[r1[0]]  + " " + simbols[r1[1]] + " " + simbols[r1[2]] + "\n");
                 System.out.println("e' uscito: " + simbols[r2[0]]  + " " + simbols[r2[1]] + " " + simbols[r2[2]] + "\n");

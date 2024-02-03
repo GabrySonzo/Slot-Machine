@@ -11,7 +11,7 @@ public class Slot {
     public Slot(){
         simbols = new String[]{"ciliegia","banana","mela","arancia","uva","diamante","spugna","volpe","tasso","sette"};
         values = new int[]{2,4,5,8,10,20,50,80,100,1000};
-        cash = 10000;
+        cash = 10;
     }
 
     public String[] spin(int bet, Socket s){
@@ -40,19 +40,16 @@ public class Slot {
     
         if(r2[0] == r2[1] && r2[1] == r2[2]){
             bet *= values[r2[0]];
-            System.out.println("moltiplicatore:" + values[r2[0]]/2);
             response[1] = "Hai fatto una tripletta";
             response[2] = "x" + values[r2[0]]/2;
         }
         else if(r2[0] == r2[1] || r2[1] == r2[2]){
             bet *= values[r2[1]]/2;
-            System.out.println("moltiplicatore:" + values[r2[1]]/2);
             response[1] = "Hai fatto una doppia";
             response[2] = "x" + values[r2[1]]/2;
         }
         else if(r2[0] == r2[2]){
             bet *= values[r2[0]]/2;
-            System.out.println("moltiplicatore:" + values[r2[0]]/2);
             response[1] = "Hai fatto una doppia";
             response[2] = "x" + values[r2[0]]/2;
         }
@@ -63,7 +60,8 @@ public class Slot {
         }
         cash -= bet;
         if(cash <= 0){
-            response[4] = "false";
+            System.out.println("La slot ha finito i soldi, ha vinto l'utente" + s.getPort());
+            response[4] = "perso";
             response[5] = s.getPort() + "";
         }
 
