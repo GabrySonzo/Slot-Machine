@@ -7,21 +7,31 @@ public class ServerThread extends Thread{
 
     private Socket socket;
     private Slot slot;
+    private BufferedReader in;
+    private ObjectOutputStream out;
+    private String[] response;
+
+
 
     public ServerThread (Socket socket, Slot slot) {
-        this.socket = socket;
-        this.slot = slot;
+     
+        try{
+            this.socket = socket;
+            this.slot = slot;
+            in = new BufferedReader(new InputStreamReader(socket.getInputStream())); 
+            out = new ObjectOutputStream(socket.getOutputStream());
+            response = new String[6];
+            response[3] = Integer.toString(slot.getCash());
+            out.writeUnshared(response);
+        }
+        catch (IOException e) {
+            System.out.println("IOException: " + e);
+        }
 
     }
 
     public void run() {
         try {
-            BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream())); 
-            ObjectOutputStream out = new ObjectOutputStream(socket.getOutputStream());
-            String[] response = new String[6];
-            response[3] = Integer.toString(slot.getCash());
-            out.writeUnshared(response);
-
             while(true) {
                 String userInput = in.readLine();
                 if (userInput == null || userInput.equals("QUIT")){
@@ -45,6 +55,15 @@ public class ServerThread extends Thread{
             in.close();
             System.out.print(" -- RICEZIONE DI UNA CHIAMATA DI CHIUSURA DA " + socket.getPort() + "/" + socket.getLocalPort() + " -- \n");
             socket.close();
+        }
+        catch (IOException e) {
+            System.out.println("IOException: " + e);
+        }
+    }
+
+    public void send(String[] response){
+        try{
+            out.writeUnshared(response);
         }
         catch (IOException e) {
             System.out.println("IOException: " + e);

@@ -1,23 +1,26 @@
 package Server;
 
 import java.net.Socket;
+import java.util.*;
 
 public class Slot {
     
     private String[] simbols;
     private int[] values;
     private int cash;
+    private LinkedList<ServerThread> clients;
 
     public Slot(){
         simbols = new String[]{"ciliegia","banana","mela","arancia","uva","diamante","spugna","volpe","tasso","sette"};
         values = new int[]{2,4,5,8,10,20,50,80,100,1000};
-        cash = 10;
+        cash = 10000;
+        clients = new LinkedList<ServerThread>();
     }
 
     public String[] spin(int bet, Socket s){
         String[] response = new String[6];
         response[4] = "true";
-        //cash += bet;
+        cash += bet;
         int[] r1 = new int[3];
         int[] r2 = new int[3];
         int[] r3 = new int[3];
@@ -67,11 +70,22 @@ public class Slot {
 
         response[0] = bet + "";
         response[3] = cash + "";
+        broadcast(response);
         return response;
     }
 
     public int getCash(){
         return cash;
+    }
+
+    public void addClient(ServerThread client){
+        clients.add(client);
+    }
+
+    public void broadcast(String[] response){
+        for(ServerThread client : clients){
+            client.send(response);
+        }
     }
 
 }

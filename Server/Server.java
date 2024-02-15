@@ -17,6 +17,7 @@ public class Server {
             System.out.print("-- RICEZIONE DI UNA CHIMATA DI APERTURA DA " + socket.getPort() + "/" + socket.getLocalPort() + " -- \n");
             //avvia il processo per ogni client 
             ServerThread serverThread = new ServerThread(socket, slot);
+            slot.addClient(serverThread);
             serverThread.start();
         }
         //stdIn.close();
