@@ -2,6 +2,7 @@ package Server;
 
 import java.io.*;
 import java.net.*;
+import java.util.HashMap;
 
 public class ServerThread extends Thread{
 
@@ -9,9 +10,7 @@ public class ServerThread extends Thread{
     private Slot slot;
     private BufferedReader in;
     private ObjectOutputStream out;
-    private String[] response;
-
-
+    private HashMap<String, String> response;
 
     public ServerThread (Socket socket, Slot slot) {
      
@@ -20,8 +19,8 @@ public class ServerThread extends Thread{
             this.slot = slot;
             in = new BufferedReader(new InputStreamReader(socket.getInputStream())); 
             out = new ObjectOutputStream(socket.getOutputStream());
-            response = new String[6];
-            response[3] = Integer.toString(slot.getCash());
+            response = new HashMap<String, String>();
+            response.put("slot", Integer.toString(slot.getCash()));
             out.writeUnshared(response);
         }
         catch (IOException e) {
@@ -40,11 +39,13 @@ public class ServerThread extends Thread{
 
                     int bet = Integer.parseInt(userInput);
                     System.out.print("Il Client " + socket.getPort() + "/" + socket.getLocalPort() +" ha puntato: " + userInput + " \n");
-                    
-                    response = (String[])slot.spin(bet, socket);
+
+                    response = slot.spin(bet, socket);
+
                     out.writeUnshared(response);
 
-                    System.out.println("[" + response[0] + "] [" + response[1] + "] [" + response[2] + "] [" + response[3] + "] [" + response[4] + "] [" + response[5] + "]\n");
+                    System.out.println("[" + response.get("bet") + "] [" + response.get("message") + "] [" + response.get("multiplier") + "] [" + response.get("slot") + "] [" + response.get("win") + "] [" + response.get("winner") + "]\n");
+                    
                 }
                 /*System.out.println("e' uscito: " + simbols[r1[0]]  + " " + simbols[r1[1]] + " " + simbols[r1[2]] + "\n");
                 System.out.println("e' uscito: " + simbols[r2[0]]  + " " + simbols[r2[1]] + " " + simbols[r2[2]] + "\n");
@@ -58,10 +59,11 @@ public class ServerThread extends Thread{
         }
         catch (IOException e) {
             System.out.println("IOException: " + e);
+            System.out.print("qualcosa e' andato storto\n");
         }
     }
 
-    public void send(String[] response){
+    public void send(HashMap<String, String> response){
         try{
             out.writeUnshared(response);
         }

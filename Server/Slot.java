@@ -9,17 +9,19 @@ public class Slot {
     private int[] values;
     private int cash;
     private LinkedList<ServerThread> clients;
+    private HashMap<String, String> response;
 
     public Slot(){
         simbols = new String[]{"ciliegia","banana","mela","arancia","uva","diamante","spugna","volpe","tasso","sette"};
         values = new int[]{2,4,5,8,10,20,50,80,100,1000};
         cash = 10000;
         clients = new LinkedList<ServerThread>();
+        response = new HashMap<String, String>();
+        response.put("win", "false");
     }
 
-    public String[] spin(int bet, Socket s){
-        String[] response = new String[6];
-        response[4] = "true";
+    public HashMap<String, String> spin(int bet, Socket s){
+        response.put("winner", s.getPort() + "");
         cash += bet;
         int[] r1 = new int[3];
         int[] r2 = new int[3];
@@ -43,33 +45,27 @@ public class Slot {
     
         if(r2[0] == r2[1] && r2[1] == r2[2]){
             bet *= values[r2[0]];
-            response[1] = "Hai fatto una tripletta";
-            response[2] = "x" + values[r2[0]]/2;
+            response.put("message", "Hai fatto una tripletta");
+            response.put("multiplier", "x" + values[r2[0]]/2);
         }
         else if(r2[0] == r2[1] || r2[1] == r2[2]){
             bet *= values[r2[1]]/2;
-            response[1] = "Hai fatto una doppia";
-            response[2] = "x" + values[r2[1]]/2;
-        }
-        else if(r2[0] == r2[2]){
-            bet *= values[r2[0]]/2;
-            response[1] = "Hai fatto una doppia";
-            response[2] = "x" + values[r2[0]]/2;
+            response.put("message", "Hai fatto una doppia");
+            response.put("multiplier", "x" + values[r2[1]]/2);
         }
         else{
             bet = 0;
-            response[1] = "Hai perso";
-            response[2] = "x0";
+            response.put("message", "Hai perso");
+            response.put("multiplier", "x0");
         }
         cash -= bet;
         if(cash <= 0){
             System.out.println("La slot ha finito i soldi, ha vinto l'utente" + s.getPort());
-            response[4] = "perso";
-            response[5] = s.getPort() + "";
+            response.put("win", "true");
         }
 
-        response[0] = bet + "";
-        response[3] = cash + "";
+        response.put("bet", bet + "");
+        response.put("slot", cash + "");
         broadcast(response);
         return response;
     }
@@ -81,8 +77,8 @@ public class Slot {
     public void addClient(ServerThread client){
         clients.add(client);
     }
-
-    public void broadcast(String[] response){
+    
+    public void broadcast(HashMap<String, String> response){
         for(ServerThread client : clients){
             client.send(response);
         }

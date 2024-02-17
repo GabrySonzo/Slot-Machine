@@ -2,6 +2,7 @@ package Client;
 
 import java.io.*;
 import java.net.*;
+import java.util.HashMap;
 
 public class Client { 
 
@@ -11,7 +12,7 @@ public class Client {
     private BufferedReader stdIn;
     private int cash;
     private int slot;
-    private String[] serverResponse;
+    private HashMap<String, String> serverResponse;
     private ClientThread clientThread;
 
     public Client(){
@@ -21,12 +22,13 @@ public class Client {
             out = new DataOutputStream(socket.getOutputStream()); 
             in = new ObjectInputStream(socket.getInputStream());
             stdIn = new BufferedReader(new InputStreamReader(System.in));
+            serverResponse = new HashMap<String, String>();
             cash = 1000;
             synchronized(in){
-                serverResponse = (String[])in.readObject();
+                serverResponse = (HashMap<String, String>)in.readObject();
             }
-            slot = Integer.parseInt(serverResponse[3]);
-            clientThread = new ClientThread(this, in, out, slot);
+            slot = Integer.parseInt(serverResponse.get("slot"));
+            clientThread = new ClientThread(this, in, slot, socket);
             clientThread.start();
         }
         catch (Exception e) {
@@ -38,8 +40,12 @@ public class Client {
 
         System.out.print("Per disconnettersi dal Server scrivere: QUIT\n"); 
 
-        while (true) 
+        while (true)
         {
+            if(cash == 0){
+                System.out.println("Hai finito i soldi");
+                break;
+            }
             System.out.println("Hai " + cash + " soldi");
             System.out.println("La slot ha " + slot + " soldi");
             System.out.print("Scrivi la tua puntata: ");
@@ -56,23 +62,24 @@ public class Client {
                 out.writeBytes(userInput + '\n');
 
                 synchronized(in){
-                    serverResponse  = (String[])in.readObject();
+                    serverResponse = (HashMap<String, String>)in.readObject();
                 }
-                //System.out.println(serverResponse[0] + " " + serverResponse[1] + " " + serverResponse[2] + " " + serverResponse[3] + " " + serverResponse[4] + " " + serverResponse[5] + "\n");
-                if(serverResponse[4].equals("perso")){
-                    System.out.println("La slot ha finito i soldi, ha vinto l'utente " + serverResponse[5]);
+                if(serverResponse.get("win").equals("true")){
+                    System.out.println("La slot ha finito i soldi, ha vinto l'utente " + serverResponse.get("winner"));
                     break;
                 }
-                System.out.println(serverResponse[1] + "(" + serverResponse[2] + ")\n");
-                cash += Integer.parseInt(serverResponse[0]);
-                slot = Integer.parseInt(serverResponse[3]);
+                System.out.println(serverResponse.get("message") + "(" + serverResponse.get("multiplier") + ")\n");
+                cash += Integer.parseInt(serverResponse.get("bet"));
+                slot = Integer.parseInt(serverResponse.get("slot"));
             }
         } 
-        out.writeBytes("QUIT\n");
 
+        out.writeBytes("QUIT\n");
         out.close(); 
         in.close(); 
-        socket.close(); 
+        
+        socket.close();
+        
     } 
 
     public void print(String message){
