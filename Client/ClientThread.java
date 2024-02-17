@@ -29,7 +29,7 @@ public class ClientThread extends Thread{
                 }
                 if(slot != Integer.parseInt(serverResponse[3])){
                     slot = Integer.parseInt(serverResponse[3]);
-                    client.print("La slot ha " + slot + " soldi" + "\n" + "Scrivi la tua puntata: ");
+                    client.print("\nLa slot ha " + slot + " soldi" + "\n" + "Scrivi la tua puntata: ");
                 }
             }
             catch (Exception e) {

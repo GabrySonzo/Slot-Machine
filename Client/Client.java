@@ -70,7 +70,6 @@ public class Client {
         } 
         out.writeBytes("QUIT\n");
 
-        //Chiusura dello Stream e del Socket 
         out.close(); 
         in.close(); 
         socket.close(); 
