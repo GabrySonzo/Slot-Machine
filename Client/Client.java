@@ -12,7 +12,7 @@ public class Client {
     private BufferedReader stdIn;
     private int cash;
     private int slot;
-    private HashMap<String, String> serverResponse;
+    private HashMap<String, Object> serverResponse;
     private ClientThread clientThread;
 
     public Client(){
@@ -22,12 +22,12 @@ public class Client {
             out = new DataOutputStream(socket.getOutputStream()); 
             in = new ObjectInputStream(socket.getInputStream());
             stdIn = new BufferedReader(new InputStreamReader(System.in));
-            serverResponse = new HashMap<String, String>();
+            serverResponse = new HashMap<String, Object>();
             cash = 1000;
             synchronized(in){
-                serverResponse = (HashMap<String, String>)in.readObject();
+                serverResponse = (HashMap<String, Object>)in.readObject();
             }
-            slot = Integer.parseInt(serverResponse.get("slot"));
+            slot = Integer.parseInt((String)serverResponse.get("slot"));
             clientThread = new ClientThread(this, in, slot, socket);
             clientThread.start();
         }
@@ -62,15 +62,19 @@ public class Client {
                 out.writeBytes(userInput + '\n');
 
                 synchronized(in){
-                    serverResponse = (HashMap<String, String>)in.readObject();
+                    serverResponse = (HashMap<String, Object>)in.readObject();
                 }
                 if(serverResponse.get("win").equals("true")){
                     System.out.println("La slot ha finito i soldi, ha vinto l'utente " + serverResponse.get("winner"));
                     break;
                 }
+                String[][] results = (String[][])serverResponse.get("results");
+                for(int i=0; i<3; i++){
+                    System.out.println(results[i][0] + " " + results[i][1] + " " + results[i][2]);
+                }
                 System.out.println(serverResponse.get("message") + "(" + serverResponse.get("multiplier") + ")\n");
-                cash += Integer.parseInt(serverResponse.get("bet"));
-                slot = Integer.parseInt(serverResponse.get("slot"));
+                cash += Integer.parseInt((String)serverResponse.get("bet"));
+                slot = Integer.parseInt((String)serverResponse.get("slot"));
             }
         } 
 

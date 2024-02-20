@@ -10,7 +10,7 @@ public class ServerThread extends Thread{
     private Slot slot;
     private BufferedReader in;
     private ObjectOutputStream out;
-    private HashMap<String, String> response;
+    private HashMap<String, Object> response;
 
     public ServerThread (Socket socket, Slot slot) {
      
@@ -19,7 +19,7 @@ public class ServerThread extends Thread{
             this.slot = slot;
             in = new BufferedReader(new InputStreamReader(socket.getInputStream())); 
             out = new ObjectOutputStream(socket.getOutputStream());
-            response = new HashMap<String, String>();
+            response = new HashMap<String, Object>();
             response.put("slot", Integer.toString(slot.getCash()));
             out.writeUnshared(response);
         }
@@ -63,7 +63,7 @@ public class ServerThread extends Thread{
         }
     }
 
-    public void send(HashMap<String, String> response){
+    public void send(HashMap<String, Object> response){
         try{
             out.writeUnshared(response);
         }

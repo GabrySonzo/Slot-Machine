@@ -11,7 +11,7 @@ public class ClientThread extends Thread{
     private ObjectInputStream in;
     private Socket socket;
     private int slot;
-    private HashMap<String, String> serverResponse;
+    private HashMap<String, Object> serverResponse;
 
     public ClientThread(Client client, ObjectInputStream in, int slot, Socket socket){
         
@@ -19,7 +19,7 @@ public class ClientThread extends Thread{
         this.in = in;
         this.slot = slot;
         this.socket = socket;
-        serverResponse = new HashMap<String, String>();       
+        serverResponse = new HashMap<String, Object>();       
 
     }
 
@@ -29,12 +29,12 @@ public class ClientThread extends Thread{
 
             try{
                 synchronized(in){
-                    serverResponse = (HashMap<String, String>)in.readObject();
+                    serverResponse = (HashMap<String, Object>)in.readObject();
                 }
-                if(slot != Integer.parseInt(serverResponse.get("slot"))){
-                    slot = Integer.parseInt(serverResponse.get("slot"));
+                if(slot != Integer.parseInt((String)serverResponse.get("slot"))){
+                    slot = Integer.parseInt((String)serverResponse.get("slot"));
                     //if(socket.getLocalPort() != Integer.parseInt(serverResponse.get("winner"))){
-                        client.print("\nLa slot ha " + slot + " soldi" + "\n" + "Scr5vi la tua puntata: ");
+                        client.print("\nLa slot ha " + slot + " soldi" + "\n" + "Scrivi la tua puntata: ");
                     //}
                 }
             }
